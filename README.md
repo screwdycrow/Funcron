@@ -1,7 +1,7 @@
 # Funcron 
 A library to schedule function calls, for NodeJS and the browser, 
 
-##Examples
+## Examples
 
 Depending on your enviroment you'll have to require Funcron, or include id directly on your
 browser via script tags 
