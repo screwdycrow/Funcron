@@ -146,6 +146,7 @@
         self.getTimeSchedule = function () {
             return arrSch;
         };
+
         self.startTimeSchedule = function () {
             clearTimeout(timeout);
             var timeNow = findPlaceInTime();
@@ -163,6 +164,9 @@
                 }
             }
 
+        };
+        self.stopTimeSchedule = function () {
+            clearTimeout(timeout);
         }
 
     };
