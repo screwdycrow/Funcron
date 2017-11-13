@@ -65,3 +65,11 @@ for a better understanding of maxSchTime consider the following  timeslots
 if the ```maxSchTime``` is setted on 10 mins (60*10) and the time that funcron will start is at 11:10:00, the first function 
 to be called will be the ```defaultFn```. then at 12:00:00 the corresponding ```fn``` and after that at 12:10:00 the default 
 function will run again.
+
+##To Do:
+1) Repeat the schedule for next day when the last timeslot function is executed by default.
+2) timeslots to accept Date objects, so that funcron can be able to schedule actions 
+on more than one day range.
+
+
+
