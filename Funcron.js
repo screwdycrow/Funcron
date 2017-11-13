@@ -138,7 +138,7 @@
         maxSchTime = options.maxSchTime*1000 || false;
         arrSch = options.timeSlots || [];
         nowSch = makeNowSch(arrSch);
-        defaultFn = options.default || noop;
+        defaultFn = options.defaultFn || noop;
         self.updateTimeSchedule = function (newTimeSchedule) {
             nowSch = newTimeSchedule || nowSch
         };

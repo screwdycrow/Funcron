@@ -36,7 +36,7 @@ function pad(number) {
 let sch = new Funcron({
     timeSlots:times,
     maxSchTime:10,
-    default:function () {
+    defaultFn:function () {
         console.log('hey default is called')
     }
 });

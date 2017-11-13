@@ -1,13 +1,26 @@
 <html>
 <body>
+<style>
+    .row{
+        padding:1em;
+        margin:1em;
+        background:black;
+        color:white;
+    }
+</style>
+<div id="wrapper">
+
+</div>
 </body>
 <script src="Funcron.js"></script>
 <script>
 
     function showdate() {
         d = new Date();
-        console.log(d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
-    }
+        d = new Date();
+        document.getElementById('wrapper').innerHTML+= '<div class="row"> Time:' +
+            pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
+            '</div>'    }
 
     let makeSchedule= function(time){
         let arr = [];
@@ -19,7 +32,7 @@
                 m +=time
             }
             m = 60 - m;
-            h++;
+            h = h+ Math.random();
         }
         return arr;
     };
@@ -34,8 +47,11 @@
     let sch = new Funcron({
         timeSlots:times,
         maxSchTime:10,
-        default:function () {
-            console.log('hey default is called')
+        defaultFn:function () {
+            d = new Date();
+            document.getElementById('wrapper').innerHTML+= '<div class=row"> Default:' +
+                pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
+                    '</div>'
         }
     });
     console.log(times);
