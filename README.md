@@ -3,7 +3,7 @@ A library to schedule function calls, for NodeJS and the browser,
 
 ## Examples
 
-Depending on your enviroment you'll have to require Funcron, or include id directly on your
+Depending on your enviroment you'll have to require Funcron, or include it directly on your
 browser via script tags 
 
 Funcron accepts one object as arguement with the following parameters:
