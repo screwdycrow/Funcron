@@ -54,7 +54,7 @@ let sch = new Funcron({
     onScheduleStart:function () {
         console.log('schedule started!');
         d = new Date();
-        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in ');
+        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
 
     },
     onScheduleEnd:function () {
@@ -63,7 +63,8 @@ let sch = new Funcron({
     defaultFn:function (milliseconds) {
         d = new Date();
         console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
-    }
+    },
+    defaultFnMaxCalls:2
 });
 console.log(times);
 sch.startTimeSchedule();

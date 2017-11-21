@@ -11,8 +11,11 @@ Funcron accepts one object as arguement with the following parameters:
 | Command | Description |
 | --- | --- |
 | timeSlots | array of object in timeformat|
-| maxSchTime | time in seconds that will fire the default function after a scheduled function is called   |
+| maxTimeslotTime | time in seconds that will call the default function after a scheduled function is called   |
 | defaultFn | the default function /
+| onScheduleStart | the function to be called if the schedule is initiated before the first time slot/
+| onScheduleEnd| the function to be called after the last timeslot./
+| defaultFnMaxCalls| times the default function is allowed to be called between two timeslots/
 
 
 Format of timeSlots is an array of object that contains a ```time``` and an ```fn``` property.
@@ -66,6 +69,9 @@ if the ```maxSchTime``` is setted on 10 mins (60*10) and the time that funcron w
 to be called will be the ```defaultFn```. then at 12:00:00 the corresponding ```fn``` and after that at 12:10:00 the default 
 function will run again.
 
+In case that ```defaultFnMaxCalls``` is setted the default will run as many times it is setted and can be called until the next 
+timeslot.
+ 
 ## To Do:
 1) Repeat the schedule for next day when the last timeslot function is executed by default.
 2) timeslots to accept Date objects, so that funcron can be able to schedule actions 
