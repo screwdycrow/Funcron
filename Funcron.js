@@ -19,13 +19,13 @@
         scheduleObj = {}, //the object array for quick finding the functions of time values
         scheduleInitial = [], //the initial array passed by the user
         scheduleArr = [], //a array with time values for quick sorting
-        timeout = null,
+        timeout = null, //the timeout reference.
         dateNow = new Date(),
         //User options
         onScheduleStart = null, //callback function
         onScheduleEnd = null, //callback function
         defaultFn = null, //default function
-        defaultFnMaxCalls,
+        defaultFnMaxCalls = null , //the times that the defaultfn  is allowed to be called between two timeslots.
         maxSchTime = null, //millseconds
 
         //internal functions
@@ -87,7 +87,6 @@
                     notNextTimeslot = (sch[i] + maxSchTime * cnt < sch[i + 1]);
                 }
             }
-
             sortSchedule();
             console.log(scheduleArr);
             console.log(scheduleObj);
