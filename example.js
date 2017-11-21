@@ -6,9 +6,9 @@
 */
 let Funcron = require('./Funcron');
 
-function showdate() {
+function showdate(milliseconds) {
     d = new Date();
-    console.log(d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
+    console.log("Timeslot: "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
 }
 
 let makeSchedule= function(time){
@@ -26,18 +26,43 @@ let makeSchedule= function(time){
     return arr;
 };
 
-let times = makeSchedule(1);
+//let times = makeSchedule(1);
 
 function pad(number) {
     if (number<10) { number = ("0"+number) }
     return number;
 }
 
+let times2 = makeSchedule(1);
+let times =  [
+    {time:'18:31:00',fn:(secs)=>showdate(secs)},
+    {time:'18:31:20',fn:(secs)=>showdate(secs)},
+    {time:'18:32:00',fn:(secs)=>showdate(secs)},
+    {time:'18:33:00',fn:(secs)=>showdate(secs)},
+    {time:'18:34:30',fn:(secs)=>showdate(secs)},
+    {time:'18:35:30',fn:(secs)=>showdate(secs)},
+    {time:'18:36:00',fn:(secs)=>showdate(secs)},
+    {time:'18:37:30',fn:(secs)=>showdate(secs)},
+    {time:'18:38:00',fn:(secs)=>showdate(secs)},
+    {time:'18:39:00',fn:(secs)=>showdate(secs)},
+    {time:'19:00:00',fn:(secs)=>showdate(secs)},
+
+];
 let sch = new Funcron({
-    timeSlots:times,
-    maxSchTime:10,
-    defaultFn:function () {
-        console.log('hey default is called')
+    timeSlots:times2,
+    maxTimeslotTime:10,
+    onScheduleStart:function () {
+        console.log('schedule started!');
+        d = new Date();
+        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in ');
+
+    },
+    onScheduleEnd:function () {
+        sch.startTimeSchedule(1)
+    },
+    defaultFn:function (milliseconds) {
+        d = new Date();
+        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
     }
 });
 console.log(times);

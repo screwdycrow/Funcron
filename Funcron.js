@@ -1,173 +1,216 @@
 (function (global) {
     "use strict";
-    var  Funcron = function(options){
+    var Funcron = function (options) {
         return new Funcron.init(options);
     };
     Funcron.prototype = {};
 
-    function pad(number) {
-        if (number<10) { number = ("0"+number) }
-        return number;
-    }
-    //dont expose the initial schedule , and the initial interval.
-    var nowSch = {}, //the object array for quick finding the functions of time values
-        arrSch = [], //the initial array passed by the user
-        refSch = [], //a array with time values for quick sorting
-        timeout = null,
-        maxSchTime,
-        defaultFn,
-        isNumber = function(n){
-            return typeof(n) != "boolean" && !isNaN(n);
-        },
+    var //helper functions
         noop = function () {
         },
-        makeNowSch = function (sch) {
-            var d = new Date();//date now  since the unix epoch
-            var nowSch = {};
-            var i=0;
-            for( i ; i<sch.length; i++){
+        pad = function (number) {
+            if (number < 10) {
+                number = ("0" + number)
+            }
+            return number;
+        },
+
+        //internal variables
+        scheduleObj = {}, //the object array for quick finding the functions of time values
+        scheduleInitial = [], //the initial array passed by the user
+        scheduleArr = [], //a array with time values for quick sorting
+        timeout = null,
+        dateNow = new Date(),
+        //User options
+        onScheduleStart = null, //callback function
+        onScheduleEnd = null, //callback function
+        defaultFn = null, //default function
+        defaultFnMaxCalls,
+        maxSchTime = null, //millseconds
+
+        //internal functions
+        /**
+         * @desc stops any running the timeout
+         */
+        stopTimeSchedule = function () {
+            clearTimeout(timeout);
+        },
+        /**
+         * @desc generates functions for adding timeslots
+         * @param type
+         * @return {Function}
+         */
+        addToSchedule = function (type) {
+            return function (sum, fn) {
+                scheduleArr.push(sum);
+                scheduleObj[sum] = {
+                    //if no fn is defined mark it as empty
+                    fn: typeof fn === 'undefined' ? null : fn,
+                    type: type
+                };
+            }
+        },
+
+        addTimeslot = addToSchedule('timeslot'),
+        addDefault = addToSchedule('default'),
+        sortSchedule = function () {
+            scheduleArr.sort();
+        },
+        /**
+         * @desc formats the provided timeslots, creates an  array for sorting, and a reference object with the functions.
+         * @param sch
+         * @param days
+         * @return {{}}
+         */
+
+        addScheduleTimeslots = function (sch,days) {
+            scheduleObj = {};
+            var i = 0;
+            for (i; i < sch.length; i++) {
                 //we are expecting times in time format.
 
                 //ecmascript date iso format.
-                var iso = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+sch[i].time;
+                var iso = dateNow.getFullYear() + "-" + pad(dateNow.getMonth() + 1) + "-" + pad(dateNow.getDate() + days) + "T" + sch[i].time;
                 var sum = Date.parse(iso);
-                refSch.push(sum);
-                nowSch[sum] = {
-                    //if no fn is defined mark it as empty
-                    fn: typeof sch[i].fn === 'undefined'? null : sch[i].fn
-                };
-
+                addTimeslot(sum, sch[i].fn || noop);
             }
-            return nowSch;
         },
 
-        findNextPrevTime = function (timeslot) {
-            var index = refSch.indexOf(timeslot);
-            var prev,next,now;
+        addScheduleDefaults = function () {
+            var sch = scheduleArr.slice();
+            for (var i = 0; i < sch.length - 1; i++) {
+                var notNextTimeslot = (sch[i] + maxSchTime < sch[i + 1]);
+                var cnt = 1;
+                while (notNextTimeslot && cnt <= defaultFnMaxCalls) {
+                    addDefault(sch[i] + maxSchTime * cnt, defaultFn);
+                    cnt++;
+                    notNextTimeslot = (sch[i] + maxSchTime * cnt < sch[i + 1]);
+                }
+            }
+
+            sortSchedule();
+            console.log(scheduleArr);
+            console.log(scheduleObj);
+        },
+        /**
+         *
+         * @param arr
+         * @param timeslot
+         * @return {{prev: *, now: *, next: *}}
+         */
+        findNextPrevTime = function (arr, timeslot) {
+            var index = arr.indexOf(timeslot);
+            var prev, next, now;
             now = timeslot;
-            if( index !== refSch.length-1){
-                next = refSch[index + 1];
-            }else{
-                next = refSch[0]; //begin again.
+            if (index !== arr.length - 1 && index !== 0) {
+                //if not last or first
+                next = arr[index + 1];
+                prev = arr[index - 1];
+            } else if (index === 0) {
+                //first
+                prev = null;
+                next = arr[1];
+                //  typeof onScheduleStart === 'function' ? onScheduleStart() : noop()
+            } else if (index === arr.length) {
+                next = null;
+                prev = arr[index - 1];
+                //last
+                // typeof onScheduleEnd === 'function' ? onScheduleEnd() : noop()
             }
-            if( index !== 0){
-                prev =  refSch[index - 1];
-            }else{
-                prev =  refSch[refSch.length-1];//begin again.
-            }
-            return {prev:prev, now:now, next:next}
+
+            return {prev: prev, now: now, next: next}
         },
 
-
+        /**
+         *
+         * @return {{prev: *, now: number, next: *}}
+         */
         findPlaceInTime = function () { //...our place in time beyond the sun (the 4400)
-            //make a copy of arrSch
-            var tempArr = refSch.slice();
-            var sum = Date.now();
+            //make a shallow copy of scheduleInitial we dont need to make a full copy
+            var tempArr = scheduleArr.slice(),
+                sum = Date.now();
             tempArr.push(sum);
             tempArr.sort();
-            var newIndex = tempArr.indexOf(sum);
-            var nextTimeSlot, prevTimeSlot ;
 
-            if( newIndex !== tempArr.length-1){ //not last
-                nextTimeSlot = tempArr[newIndex + 1];
-            }else { //last
-                nextTimeSlot = tempArr[0]; //first
-            }
-            if( newIndex !== 0 ){ //not first
-                prevTimeSlot = tempArr[newIndex - 1];
-            }else { //first
-                prevTimeSlot = tempArr[tempArr.length-1]; //first
-            }
-            return {prev:prevTimeSlot,now:sum, next:nextTimeSlot };
+            return findNextPrevTime(tempArr, sum)
         },
 
-        setNextTime = function (timeslot) {
-            // var d = new Date();
-            // var timenow = mToSec(d.getMinutes()) + hToSec(d.getHours()) + d.getSeconds();
-            var millisecs;
-            var fn;
-            var timeslotfn;
-            if (maxSchTime === false){
+        /**
+         *
+         * @param timeslot
+         * @param firstTime
+         */
+        setNextTime = function (timeslot, firstTime) {
+
+            var millisecs,
+                fn;
+            console.log(timeslot);
+            if (firstTime || false && timeslot.prev!==null) {
+                    if(scheduleObj[timeslot.next].type === 'default' && scheduleObj[timeslot.prev === 'default']){
+                        defaultFn();
+                    }else if(scheduleObj[timeslot.next].type === 'default' && scheduleObj[timeslot.prev === 'timeslot']){
+                        scheduleObj[timeslot.prev].fn();
+                    }else{
+                        defaultFn()
+                    }
+                } else if (timeslot.prev = null) {
+                    typeof onScheduleEnd === 'function' ? onScheduleStart() : noop()
+                }
+
+            if (timeslot.next) {
                 //case that that maxSchTime is not defined.
                 millisecs = timeslot.next - timeslot.now;
-                fn = timeoutCallback(nowSch[timeslot.next].fn, timeslot);
-            }
-
-            if( maxSchTime ){
-                if(  maxSchTime + timeslot.prev <= timeslot.now  && timeslot.next - timeslot.now !==0){
-                    //case timenow is before the next timeslot but after the maxSchTime.
-                    millisecs = timeslot.next - timeslot.now;
-                    timeslotfn = nowSch[timeslot.next].fn || noop;
-                    fn = timeoutCallback(timeslotfn|| noop, timeslot,true);
-                }else if (maxSchTime + timeslot.prev > timeslot.now && timeslot.next - timeslot.now !==0){
-                    //case that timenow has past the timeslot and default is next
-                    millisecs = timeslot.prev + maxSchTime - timeslot.now;
-                    fn = timeoutCallback(defaultFn || noop , timeslot);
-                }else if ( maxSchTime + timeslot.prev <= timeslot.now && timeslot.next - timeslot.now === 0){
-                    //case timenow is exactly the timeslot and next is default
-                    millisecs = maxSchTime*1000;
-                    fn = timeoutCallback(defaultFn || noop , timeslot);
+                fn = timeoutCallback(scheduleObj[timeslot.next].fn, timeslot, millisecs);
+                if (fn !== undefined && millisecs) {
+                    timeout = setTimeout(fn, millisecs);
+                } else {
+                    console.error('fn or secs  was undefined')
                 }
-            }
-            if(fn !== undefined && millisecs !==  undefined){
-                timeout = setTimeout(fn,millisecs);
-            }else{
-                console.error('fn or secs  was undefined')
+            } else {
+                //if timeslot.next === null then its the end
+                typeof onScheduleEnd === 'function' ? onScheduleEnd() : noop()
             }
         },
-
-        timeoutCallback = function(fn,timeslot,nowDefault){
-            var nowDefault = nowDefault || false;
+        /**
+         *
+         * @param fn
+         * @param timeslot
+         * @param nextCallMilliseconds
+         * @return {Function}
+         */
+        timeoutCallback = function (fn, timeslot, nextCallMilliseconds) {
             return function () {
-                fn();
-                if(!maxSchTime){
-                    setNextTime(findNextPrevTime(timeslot.next));
-                }else{
-                    setNextTime(findPlaceInTime());
-                }
+                fn(nextCallMilliseconds);
+                setNextTime(findNextPrevTime(scheduleArr, timeslot.next));
 
             }
         };
 
-
-
-    Funcron.init = function(options){
+    Funcron.init = function (options) {
         var self = this;
-        //initiate the schedule and the interval timer
-        ///keep a copy of the initial array
-        maxSchTime = options.maxSchTime*1000 || false;
-        arrSch = options.timeSlots || [];
-        nowSch = makeNowSch(arrSch);
+        //initiate variables.
+        maxSchTime = options.maxTimeslotTime * 1000 || false;
+        scheduleInitial = options.timeSlots || [];
         defaultFn = options.defaultFn || noop;
-        self.updateTimeSchedule = function (newTimeSchedule) {
-            nowSch = newTimeSchedule || nowSch
-        };
+        defaultFnMaxCalls = options.defaultFnMaxCalls || 1;
+        onScheduleEnd = options.onScheduleEnd || noop;
+        onScheduleStart = options.onScheduleStart || noop;
+
 
         self.getTimeSchedule = function () {
-            return arrSch;
+            return scheduleInitial;
         };
 
-        self.startTimeSchedule = function () {
-            clearTimeout(timeout);
+        self.startTimeSchedule = function (n) {
+            stopTimeSchedule();
+            addScheduleTimeslots(scheduleInitial, n||0 );
+            if (maxSchTime) {
+                addScheduleDefaults();
+            }
             var timeNow = findPlaceInTime();
-            if(maxSchTime === false){
-                nowSch[timeNow.prev].fn();
-                setNextTime(timeNow);
-            }
-            if( typeof maxSchTime === "number" && maxSchTime !== 0  ){
-                if ( timeNow.prev + maxSchTime >= timeNow.now ){
-                    nowSch[timeNow.prev].fn();
-                    setNextTime(timeNow);
-                }else{
-                    defaultFn();
-                    setNextTime(timeNow);
-                }
-            }
-
+            setNextTime(timeNow, true)
         };
-        self.stopTimeSchedule = function () {
-            clearTimeout(timeout);
-        }
+        self.stopTimeSchedule = stopTimeSchedule
 
     };
     //make the prototype of the Schedule to point to the protytpe
@@ -175,11 +218,11 @@
     global.Funcron = Funcron;
 
     //if the enviroment is nodeJS there is no window as global object but just global.
-})(typeof window === 'undefined'? global : window);
+})(typeof window === 'undefined' ? global : window);
 
 
 //check if the eniviroment is nodeJS
-if(typeof window ==='undefined'){
+if (typeof window === 'undefined') {
     module.exports = Funcron;
 }
 
