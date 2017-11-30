@@ -21,14 +21,19 @@ Funcron accepts one object as arguement with the following parameters:
 Format of timeSlots is an array of object that contains a ```time``` and an ```fn``` property.
 the time must be on the format hh:mm:ss
 ```javascript
-var timeslots = [
-    {time:'11:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    {time:'12:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    {time:'13:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    {time:'15:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    {time:'16:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    {time:'17:00:00' ,fn:function() { console.log('i am '+this.time )}},
-    ]
+var times =  [
+    {time:'18:30:00',fn:(secs)=>showdate(secs)},
+    {time:'18:32:00',fn:(secs)=>showdate(secs)},
+    {time:'18:33:00',fn:(secs)=>showdate(secs)},
+    {time:'18:34:30',fn:(secs)=>showdate(secs)},
+    {time:'18:35:30',fn:(secs)=>showdate(secs)},
+    {time:'18:36:00',fn:(secs)=>showdate(secs)},
+    {time:'18:37:30',fn:(secs)=>showdate(secs)},
+    {time:'18:38:00',fn:(secs)=>showdate(secs)},
+    {time:'18:39:00',fn:(secs)=>showdate(secs)},
+    {time:'19:00:00',fn:(secs)=>showdate(secs)},
+
+];
     
 ```
 create a new instance of Funcron, if you don't want the default function functionality, you can 
@@ -36,13 +41,25 @@ just omit ```maxSchTime``` and ```defaultFn```. By doing that, funcron will just
 provided inside each timeslot.
 
 ```javascript
- var funcron = new Funcron({
-     timeSlots: timeslots,
-     defaultFn: function() {
-       console.log("hey, i am default! How are you?")
-     },
-     maxSchTime: 60*60 
- });
+let sch = new Funcron({
+    timeSlots:times2,
+    maxTimeslotTime:60,
+    onScheduleStart:function () {
+        console.log('schedule started!');
+        d = new Date();
+        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
+
+    },
+    onScheduleEnd:function () {
+        sch.startTimeSchedule(1)
+    },
+    defaultFn:function (milliseconds) {
+        d = new Date();
+        console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
+    },
+    defaultFnMaxCalls:1
+});
+
 ```
 start Funcron;
 

@@ -45,6 +45,7 @@
                 scheduleArr.push(sum);
                 scheduleObj[sum] = {
                     //if no fn is defined mark it as empty
+                    time: pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds()),
                     fn: typeof fn === 'undefined' ? null : fn,
                     type: type
                 };
@@ -88,8 +89,6 @@
                 }
             }
             sortSchedule();
-            console.log(scheduleArr);
-            console.log(scheduleObj);
         },
         /**
          *
@@ -144,15 +143,10 @@
             var millisecs,
                 fn;
             console.log(timeslot);
-            if (firstTime || false && timeslot.prev!==null) {
-                    if(scheduleObj[timeslot.next].type === 'default' && scheduleObj[timeslot.prev === 'default']){
-                        defaultFn();
-                    }else if(scheduleObj[timeslot.next].type === 'default' && scheduleObj[timeslot.prev === 'timeslot']){
-                        scheduleObj[timeslot.prev].fn();
-                    }else{
-                        defaultFn()
-                    }
-                } else if (timeslot.prev = null) {
+            if (firstTime  && timeslot.prev!==null) {
+                    if(scheduleObj[timeslot.prev].type === "timeslot")scheduleObj[timeslot.prev].fn();
+                    if(scheduleObj[timeslot.prev].type === "default")defaultFn();
+                } else if (timeslot.prev = null && firstTime) {
                     typeof onScheduleEnd === 'function' ? onScheduleStart() : noop()
                 }
 
@@ -196,10 +190,12 @@
         onScheduleStart = options.onScheduleStart || noop;
 
 
-        self.getTimeSchedule = function () {
+        self.getTimeSlots = function () {
             return scheduleInitial;
         };
-
+        self.getTimeSchedule = function () {
+          return {sequence:scheduleArr,reference:scheduleObj}
+        };
         self.startTimeSchedule = function (n) {
             stopTimeSchedule();
             addScheduleTimeslots(scheduleInitial, n||0 );

@@ -35,8 +35,7 @@ function pad(number) {
 
 let times2 = makeSchedule(1);
 let times =  [
-    {time:'18:31:00',fn:(secs)=>showdate(secs)},
-    {time:'18:31:20',fn:(secs)=>showdate(secs)},
+    {time:'18:30:00',fn:(secs)=>showdate(secs)},
     {time:'18:32:00',fn:(secs)=>showdate(secs)},
     {time:'18:33:00',fn:(secs)=>showdate(secs)},
     {time:'18:34:30',fn:(secs)=>showdate(secs)},
@@ -50,7 +49,7 @@ let times =  [
 ];
 let sch = new Funcron({
     timeSlots:times2,
-    maxTimeslotTime:10,
+    maxTimeslotTime:60,
     onScheduleStart:function () {
         console.log('schedule started!');
         d = new Date();
@@ -64,7 +63,7 @@ let sch = new Funcron({
         d = new Date();
         console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
     },
-    defaultFnMaxCalls:2
+    defaultFnMaxCalls:1
 });
 console.log(times);
 sch.startTimeSchedule();
