@@ -37,7 +37,7 @@ var times =  [
     
 ```
 create a new instance of Funcron, if you don't want the default function functionality, you can 
-just omit ```maxSchTime``` and ```defaultFn```. By doing that, funcron will just run the ```fn``` functions from 
+just omit ```maxTimeslotTime``` and ```defaultFn```. By doing that, funcron will just run the ```fn``` functions from 
 provided inside each timeslot.
 
 ```javascript
@@ -68,7 +68,7 @@ funcron.startTimeSchedule();
 ```
 lets suppose time is 12:10:00
 so funcron will run the 12:00:00 ```fn``` function, the next function to be called will be at 13:00:00. Notice now, that in the timeslots array
-we intentionally left an hour blank. Since we have setted the ```macSchTime``` at ```60*60``` (1 hour) secs the next
+we intentionally left an hour blank. Since we have setted the ```maxTimeslotTime``` at ```60*60``` (1 hour) secs the next
 function that will run at 14:00:00 will be the ```defaultFn``` and then at 17:00:00 the corresponding ```fn```
 
 for a better understanding of maxSchTime consider the following  timeslots
@@ -82,7 +82,7 @@ for a better understanding of maxSchTime consider the following  timeslots
     {time:'17:00:00' ,fn:function() { console.log('i am '+this.time )}}
     ]
 ```
-if the ```maxSchTime``` is setted on 10 mins (60*10) and the time that funcron will start is at 11:10:00, the first function 
+if the ```maxTimeslotTime``` is setted on 10 mins (60*10) and the time that funcron will start is at 11:10:00, the first function 
 to be called will be the ```defaultFn```. then at 12:00:00 the corresponding ```fn``` and after that at 12:10:00 the default 
 function will run again.
 
