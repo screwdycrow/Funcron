@@ -50,6 +50,7 @@ let times =  [
 let sch = new Funcron({
     timeSlots:times2,
     maxTimeslotTime:60,
+    timeZone:"+02:00",
     onScheduleStart:function () {
         console.log('schedule started!');
         d = new Date();
@@ -65,7 +66,7 @@ let sch = new Funcron({
     },
     defaultFnMaxCalls:1
 });
-console.log(times);
 sch.startTimeSchedule();
+console.log(sch.getTimeSchedule());
 
 
