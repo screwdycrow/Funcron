@@ -77,6 +77,7 @@
                     var sum = Date.parse(iso);
                     addTimeslot(sum, sch[i].fn || noop);
                 }
+                sortSchedule();
             },
 
             addScheduleDefaults = function () {
