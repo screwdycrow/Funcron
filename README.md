@@ -1,5 +1,12 @@
 # Funcron 
-A library to schedule function calls, for NodeJS and the browser, 
+A library to schedule function calls, for NodeJS and the browser. 
+
+## Important Notes
+To be honest, this is intented mostly for
+browser and client-side usage, as in node js and server enviroments, you might want to use other, more "stable" solutions, like cron jobs. Funcron is using timeouts
+to schedule its functions, and while in theory it should work for longer time period, circumstances might vary from system to system so there might be some problems.
+So do not use funcron for very long term task scheduling. By default Funcron is designed to be used on a 1-day time period, but you can easily bypass that by using 
+hook events. 
 
 ## Examples
 
@@ -66,6 +73,7 @@ start Funcron;
 ```javascript
 funcron.startTimeSchedule();
 ```
+
 lets suppose time is 12:10:00
 so funcron will run the 12:00:00 ```fn``` function, the next function to be called will be at 13:00:00. Notice now, that in the timeslots array
 we intentionally left an hour blank. Since we have setted the ```maxTimeslotTime``` at ```60*60``` (1 hour) secs the next
@@ -90,7 +98,6 @@ In case that ```defaultFnMaxCalls``` is setted the default will run as many time
 timeslot.
  
 ## To Do:
-1) Repeat the schedule for next day when the last timeslot function is executed by default.
 2) timeslots to accept Date objects, so that funcron can be able to schedule actions 
 on more than one day range.
 
