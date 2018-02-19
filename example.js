@@ -5,7 +5,6 @@
 /*
 */
 let Funcron = require('./Funcron');
-
 function showdate(milliseconds) {
     d = new Date();
     console.log("Timeslot: "+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds()+' next call in '+(milliseconds/1000)+' secs');
@@ -63,7 +62,7 @@ let sch = new Funcron({
         console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
     },
     onScheduleEnd:function () {
-        sch.startTimeSchedule(1)
+        sch.startTimeSchedule(2)
     },
     defaultFn:function (milliseconds) {
         d = new Date();
