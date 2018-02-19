@@ -47,6 +47,12 @@ let times =  [
     {time:'19:00:00',fn:(secs)=>showdate(secs)},
 
 ];
+let times3 =[
+    {time:'16:00:00',fn:(secs)=>showdate(secs)},
+    {time:'16:01:00',fn:(secs)=>showdate(secs)},
+
+];
+
 let sch = new Funcron({
     timeSlots:times2,
     maxTimeslotTime:60,
@@ -55,7 +61,6 @@ let sch = new Funcron({
         console.log('schedule started!');
         d = new Date();
         console.log("Default:"+d.getHours()+":"+d.getMinutes()+":"+d.getSeconds());
-
     },
     onScheduleEnd:function () {
         sch.startTimeSchedule(1)
@@ -66,6 +71,7 @@ let sch = new Funcron({
     },
     defaultFnMaxCalls:1
 });
+
 sch.startTimeSchedule();
 console.log(sch.getTimeSchedule());
 

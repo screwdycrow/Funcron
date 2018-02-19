@@ -7,6 +7,9 @@
         background:black;
         color:white;
     }
+    .row-default{
+        background: #dcdcdc;
+    }
 </style>
 <div id="wrapper">
 
@@ -14,14 +17,6 @@
 </body>
 <script src="Funcron.js"></script>
 <script>
-
-    function showdate() {
-        d = new Date();
-        d = new Date();
-        document.getElementById('wrapper').innerHTML+= '<div class="row"> Time:' +
-            pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
-            '</div>'    }
-
     let makeSchedule= function(time){
         let arr = [];
         let h = 0;
@@ -32,29 +27,66 @@
                 m +=time
             }
             m = 60 - m;
-            h = h+ Math.random();
+            h++;
         }
         return arr;
     };
-
-    let times = makeSchedule(1);
-
     function pad(number) {
         if (number<10) { number = ("0"+number) }
         return number;
     }
 
+    function showdate() {
+        let d = new Date();
+        document.getElementById('wrapper').innerHTML+= '<div class="row"> Time:' +
+            pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
+            '</div>'    }
+
+    let times3 = makeSchedule(1);
+    let times =  [
+        {time:'18:30:00',fn:(secs)=>showdate(secs)},
+        {time:'18:32:00',fn:(secs)=>showdate(secs)},
+        {time:'18:33:00',fn:(secs)=>showdate(secs)},
+        {time:'18:34:30',fn:(secs)=>showdate(secs)},
+        {time:'18:35:30',fn:(secs)=>showdate(secs)},
+        {time:'18:36:00',fn:(secs)=>showdate(secs)},
+        {time:'18:37:30',fn:(secs)=>showdate(secs)},
+        {time:'18:38:00',fn:(secs)=>showdate(secs)},
+        {time:'18:39:00',fn:(secs)=>showdate(secs)},
+        {time:'19:00:00',fn:(secs)=>showdate(secs)},
+
+    ];
+
+    let time4 = [
+        {    time:"11:00:00",fn:(secs)=>showdate(secs)}
+    ]
+
     let sch = new Funcron({
         timeSlots:times,
-        maxSchTime:10,
-        defaultFn:function () {
-            d = new Date();
-            document.getElementById('wrapper').innerHTML+= '<div class=row"> Default:' +
+        maxTimeslotTime:30,
+        timeZone:"+02:00",
+        onScheduleStart:function () {
+            console.log('schedule started!');
+            let d = new Date();
+            document.getElementById('wrapper').innerHTML+= '<div class="row-default"> Time:' +
                 pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
-                    '</div>'
-        }
+                '</div>'
+        },
+        onScheduleEnd:function () {
+            console.log('on end');
+            sch.startTimeSchedule(1);
+            console.log(Date.now());
+            console.log(sch.getTimeSchedule())
+        },
+        defaultFn:function (milliseconds) {
+            let d = new Date();
+            document.getElementById('wrapper').innerHTML+= '<div class="row-default"> Time:' +
+                pad(d.getHours())+':'+pad(d.getMinutes()+':'+pad(d.getSeconds()))+
+                '</div>'
+
+        },
+        defaultFnMaxCalls:1
     });
-    console.log(times);
     sch.startTimeSchedule();
 </script>
 </html>
