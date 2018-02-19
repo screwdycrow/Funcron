@@ -1,4 +1,4 @@
-(function (global) {
+(function () {
     "use strict";
     var Funcron = function (options) {
         return new Funcron.init(options);
@@ -248,15 +248,18 @@
     };
     //make the prototype of the Schedule to point to the protytpe
     Funcron.init.prototype = Funcron.prototype;
-    global.Funcron = Funcron;
+    if (typeof window === 'undefined') {
+        module.exports = Funcron;
+    }else{
+        window.Funcron = Funcron;
+    }
+
 
     //if the enviroment is nodeJS there is no window as global object but just global.
-})(typeof window === 'undefined' ? global : window);
+})();
 
 //check if the eniviroment is nodeJS
-if (typeof window === 'undefined') {
-    module.exports = Funcron;
-}
+
 
 
 
