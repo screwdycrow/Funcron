@@ -97,9 +97,5 @@ function will run again.
 In case that ```defaultFnMaxCalls``` is setted the default will run as many times it is setted and can be called until the next 
 timeslot.
  
-## To Do:
-2) timeslots to accept Date objects, so that funcron can be able to schedule actions 
-on more than one day range.
-
 
 
